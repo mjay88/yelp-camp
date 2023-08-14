@@ -8,7 +8,7 @@ mongoose.connect("mongodb://localhost:27017/yelp-camp", {
 	// useCreateIndex: true,//default setting in mongoose > 6
 	useUnifiedTopology: true,
 });
-
+//testing gitignore
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connections error:")); //check if there is an error
 db.once("open", () => {
