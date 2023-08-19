@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const { campgroundSchema } = require("../schemas.js");
 const Campground = require("../models/campground"); //import model from models folder
 const ExpressError = require("../utils/ExpressError");
+const { isLoggedIn } = require("../middleware");
 
 //server side validation with Joi, see schemas.js
 const validateCampground = (req, res, next) => {
@@ -25,12 +26,13 @@ router.get(
 	})
 );
 //route for serving form for new campground, has to go before details route
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
 	res.render("campgrounds/new");
 });
 //route to post new campground
 router.post(
 	"/",
+	isLoggedIn,
 	validateCampground,
 	catchAsync(async (req, res, next) => {
 		const campground = new Campground(req.body.campground);
@@ -60,6 +62,7 @@ router.get(
 //edit route to serve edit form
 router.get(
 	"/:id/edit",
+	isLoggedIn,
 	catchAsync(async (req, res) => {
 		const campground = await Campground.findById(req.params.id);
 		if (!campground) {
@@ -72,6 +75,7 @@ router.get(
 //put route for editting
 router.put(
 	"/:id",
+	isLoggedIn,
 	validateCampground, //server side validation w/Joi
 	catchAsync(async (req, res) => {
 		const { id } = req.params;
@@ -86,6 +90,7 @@ router.put(
 //delete route
 router.delete(
 	"/:id",
+	isLoggedIn,
 	catchAsync(async (req, res) => {
 		const { id } = req.params;
 		await Campground.findByIdAndDelete(id);
