@@ -1,21 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const catchAsync = require("../utils/catchAsync");
-const { campgroundSchema } = require("../schemas.js");
 const Campground = require("../models/campground"); //import model from models folder
-const ExpressError = require("../utils/ExpressError");
-const { isLoggedIn } = require("../middleware");
-
-//server side validation with Joi, see schemas.js
-const validateCampground = (req, res, next) => {
-	const { error } = campgroundSchema.validate(req.body);
-	if (error) {
-		const msg = error.details.map((el) => el.message).join(",");
-		throw new ExpressError(msg, 400);
-	} else {
-		next();
-	}
-};
+const { isLoggedIn, validateCampground, isAuthor } = require("../middleware");
 
 //campground index
 router.get(
@@ -36,6 +23,7 @@ router.post(
 	validateCampground,
 	catchAsync(async (req, res, next) => {
 		const campground = new Campground(req.body.campground);
+		campground.author = req.user._id;
 		await campground.save();
 		req.flash("success", "Succesfully made a new campground");
 		res.redirect(`/campgrounds/${campground._id}`);
@@ -46,10 +34,15 @@ router.post(
 router.get(
 	"/:id",
 	catchAsync(async (req, res) => {
-		const campground = await Campground.findById(req.params.id).populate(
-			"reviews"
-		);
-		console.log(campground);
+		const campground = await Campground.findById(req.params.id)
+			.populate({
+				path: "reviews",
+				populate: {
+					path: "author",
+				},
+			})
+			.populate("author");
+		console.log(campground, "campground from campground routes");
 		if (!campground) {
 			req.flash("error", "Cannot find that campground");
 			return res.redirect("/campgrounds");
@@ -63,12 +56,15 @@ router.get(
 router.get(
 	"/:id/edit",
 	isLoggedIn,
+	isAuthor,
 	catchAsync(async (req, res) => {
-		const campground = await Campground.findById(req.params.id);
+		const { id } = req.params;
+		const campground = await Campground.findById(id);
 		if (!campground) {
 			req.flash("error", "Cannot find that campground");
 			return res.redirect("/campgrounds");
 		}
+
 		res.render("campgrounds/edit", { campground });
 	})
 );
@@ -76,9 +72,11 @@ router.get(
 router.put(
 	"/:id",
 	isLoggedIn,
+	isAuthor,
 	validateCampground, //server side validation w/Joi
 	catchAsync(async (req, res) => {
 		const { id } = req.params;
+
 		const campground = await Campground.findByIdAndUpdate(id, {
 			...req.body.campground,
 		});
@@ -91,6 +89,7 @@ router.put(
 router.delete(
 	"/:id",
 	isLoggedIn,
+	isAuthor,
 	catchAsync(async (req, res) => {
 		const { id } = req.params;
 		await Campground.findByIdAndDelete(id);
