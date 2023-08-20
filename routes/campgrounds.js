@@ -25,7 +25,7 @@ router.post(
 		const campground = new Campground(req.body.campground);
 		campground.author = req.user._id;
 		await campground.save();
-		req.flash("success", "Succesfully made a new campground");
+		req.flash("success", "Successfully made a new campground!");
 		res.redirect(`/campgrounds/${campground._id}`);
 	})
 );
@@ -42,12 +42,11 @@ router.get(
 				},
 			})
 			.populate("author");
-		console.log(campground, "campground from campground routes");
+		console.log(campground);
 		if (!campground) {
-			req.flash("error", "Cannot find that campground");
+			req.flash("error", "Cannot find that campground!");
 			return res.redirect("/campgrounds");
 		}
-
 		res.render("campgrounds/show", { campground });
 	})
 );

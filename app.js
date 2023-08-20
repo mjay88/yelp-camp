@@ -18,7 +18,7 @@ const userRoutes = require("./routes/users");
 const app = express();
 
 //connect db
-mongoose.connect("mongodb://localhost:27017/yelp-camp", {
+mongoose.connect("mongodb://localhost:27017/yelp-camp2", {
 	useNewUrlParser: true,
 	// useCreateIndex: true,//default setting in mongoose > 6
 	useUnifiedTopology: true,

@@ -11,7 +11,7 @@ const catchAsync = require("../utils/catchAsync");
 router.post(
 	"/",
 	isLoggedIn,
-	validateReview, //server side validation w/Joi
+	validateReview, //server side validation w/ joi
 	catchAsync(async (req, res) => {
 		const campground = await Campground.findById(req.params.id);
 		const review = new Review(req.body.review);
@@ -19,7 +19,7 @@ router.post(
 		campground.reviews.push(review);
 		await review.save();
 		await campground.save();
-		req.flash("success", "Successfully added your review!!!");
+		req.flash("success", "Created new review!");
 		res.redirect(`/campgrounds/${campground._id}`);
 	})
 );
