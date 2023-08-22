@@ -30,6 +30,7 @@ router
 		//put route for editting
 		isLoggedIn,
 		isAuthor,
+		upload.array("image"),
 		validateCampground, //server side validation w/Joi
 		catchAsync(campgrounds.updateCampground)
 	)
