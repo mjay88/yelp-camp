@@ -3,6 +3,9 @@ const router = express.Router();
 const catchAsync = require("../utils/catchAsync");
 const campgrounds = require("../controllers/campgrounds");
 const { isLoggedIn, validateCampground, isAuthor } = require("../middleware");
+const multer = require("multer");
+const { storage } = require("../cloudinary");
+const upload = multer({ storage });
 // const campground = require("../models/campground");
 
 //restructure with express router.route
@@ -12,6 +15,7 @@ router
 	//route to post new campground
 	.post(
 		isLoggedIn,
+		upload.array("image"),
 		validateCampground,
 		catchAsync(campgrounds.createCampground)
 	);
