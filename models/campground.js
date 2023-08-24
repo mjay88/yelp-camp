@@ -6,11 +6,23 @@ const ImageSchema = new Schema({
 	url: String,
 	fileName: String,
 });
+//virtuals from mongoose
 ImageSchema.virtual("thumbnail").get(function () {
 	return this.url.replace("/upload", "/upload/w_200,h_200");
 });
 const CampGroundSchema = new Schema({
 	title: String,
+	geometry: {
+		type: {
+			type: String, // Don't do `{ location: { type: String } }`
+			enum: ["Point"], // 'location.type' must be 'Point'
+			required: true,
+		},
+		coordinates: {
+			type: [Number],
+			required: true,
+		},
+	},
 	images: [ImageSchema],
 	price: Number,
 	description: String,

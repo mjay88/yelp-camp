@@ -1,7 +1,9 @@
 <% layout("layouts/boilerplate") %>
 <link rel="stylesheet" href="/stylesheets/stars.css" />
+
 <div class="row">
 	<div class="col-6">
+		<div id="map" style="width: 400px; height: 300px"></div>
 		<!-- carousel -->
 		<div id="campgroundCarouselControls" class="carousel slide">
 			<div class="carousel-inner">
@@ -31,6 +33,7 @@
 				<span class="carousel-control-next-icon" aria-hidden="true"></span>
 				<span class="visually-hidden">Next</span>
 			</button>
+
 			<% } %>
 		</div>
 		<!-- carousel end -->
@@ -166,3 +169,25 @@
 		<%} %>
 	</div>
 </div>
+
+<script>
+	console.log("<%-campground.geometry%>");
+	let coordinates = "<%-campground.geometry.coordinates%>";
+	coordinates = coordinates.split(",").map((s) => {
+		return parseFloat(s);
+	});
+	mapboxgl.accessToken = "<%-process.env.MAPBOX_TOKEN%>";
+	const map = new mapboxgl.Map({
+		container: "map", // container ID
+		style: "mapbox://styles/mapbox/light-v10", // style URL
+		center: coordinates, // starting position [lng, lat]
+		zoom: 9, // starting zoom
+	});
+
+	const marker = new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
+
+	const popup = new mapboxgl.Popup({ offset: 25 })
+		.setLngLat(coordinates)
+		.setHTML(`<h3><%=campground.title%></h3><p><%=campground.location%></p>`)
+		.addTo(map);
+</script>
