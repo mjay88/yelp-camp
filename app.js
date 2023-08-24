@@ -73,7 +73,9 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+//  configure the server to respond to any request under the public folder with that resource if found.
 app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static("public"));
 app.use(morgan("tiny"));
 
 app.use("/", userRoutes);
