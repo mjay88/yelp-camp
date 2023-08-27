@@ -10,30 +10,47 @@ const ImageSchema = new Schema({
 ImageSchema.virtual("thumbnail").get(function () {
 	return this.url.replace("/upload", "/upload/w_200,h_200");
 });
-const CampGroundSchema = new Schema({
-	title: String,
-	geometry: {
-		type: {
-			type: String, // Don't do `{ location: { type: String } }`
-			enum: ["Point"], // 'location.type' must be 'Point'
-			required: true,
+
+const opts = { toJSON: { virtuals: true } };
+
+const CampGroundSchema = new Schema(
+	{
+		title: String,
+		images: [ImageSchema],
+		geometry: {
+			type: {
+				type: String, // Don't do `{ location: { type: String } }`
+				enum: ["Point"], // 'location.type' must be 'Point'
+				required: true,
+			},
+			coordinates: {
+				type: [Number],
+				required: true,
+			},
 		},
-		coordinates: {
-			type: [Number],
-			required: true,
+		price: Number,
+		description: String,
+		location: String,
+		author: {
+			type: Schema.Types.ObjectId,
+			ref: "User",
 		},
+		//refernce reviews
+		reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+		//reference popUpMarkup virtual
+		// properties: {
+		// 	popUpMarkup: "<h3></h3>",
+		// },
 	},
-	images: [ImageSchema],
-	price: Number,
-	description: String,
-	location: String,
-	author: {
-		type: Schema.Types.ObjectId,
-		ref: "User",
-	},
-	//refernce reviews
-	reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+	opts
+);
+//virtual from mongoose
+CampGroundSchema.virtual("properties.popUpMarkup").get(function () {
+	return `<strong><a href="/campgrounds/${
+		this._id
+	}">${this.title}</a></strong><br><p>${this.description.substring(0, 30)}...</p>`;
 });
+
 //mongoose middleware
 CampGroundSchema.post("findOneAndDelete", async function (doc) {
 	if (doc) {
