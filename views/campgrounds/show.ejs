@@ -1,9 +1,9 @@
 <% layout("layouts/boilerplate") %>
 <link rel="stylesheet" href="/stylesheets/stars.css" />
+<link rel="stylesheet" href="/stylesheets/app.css" />
 
 <div class="row">
 	<div class="col-6">
-		<div id="map" style="width: 400px; height: 300px"></div>
 		<!-- carousel -->
 		<div id="campgroundCarouselControls" class="carousel slide">
 			<div class="carousel-inner">
@@ -73,6 +73,7 @@
 		</div>
 	</div>
 	<div class="col-6">
+		<div id="map"></div>
 		<% if(currentUser) {%>
 		<h2>Leave a Review</h2>
 		<form
@@ -183,7 +184,8 @@
 		center: coordinates, // starting position [lng, lat]
 		zoom: 9, // starting zoom
 	});
-
+	// Add zoom and rotation controls to the map.
+	map.addControl(new mapboxgl.NavigationControl());
 	const marker = new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
 
 	const popup = new mapboxgl.Popup({ offset: 25 })
