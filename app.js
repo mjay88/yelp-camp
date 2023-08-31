@@ -14,6 +14,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
+const mongoSanitize = require("express-mongo-sanitize");
 
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
@@ -45,6 +46,7 @@ const sessionConfig = {
 	saveUninitialized: true,
 	cookie: {
 		httpOnly: true,
+		// secure: true,
 		expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
 		maxAge: 1000 * 60 * 60 * 24 * 7,
 	},
@@ -58,6 +60,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 //authenticate is coming from passport local mongoose
 passport.use(new LocalStrategy(User.authenticate()));
+
+app.use(mongoSanitize());
 
 passport.serializeUser(User.serializeUser()); //how we store a user in the session
 passport.deserializeUser(User.deserializeUser());
