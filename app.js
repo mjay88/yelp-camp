@@ -24,8 +24,8 @@ const userRoutes = require("./routes/users");
 
 const app = express();
 
-// const dbUrl = process.env.DB_URL;
-const dbUrl = "mongodb://localhost:27017/yelp-camp2";
+const dbUrl = process.env.DB_URL;
+// const dbUrl = "mongodb://localhost:27017/yelp-camp2";
 
 const MongoStore = require("connect-mongo");
 
@@ -53,7 +53,7 @@ const store = MongoStore.create({
 	mongoUrl: dbUrl,
 	touchAfter: 24 * 60 * 60,
 	crypto: {
-		secret: "thisshouldbeabettersecret!",
+		secret: process.env.SECRET,
 	},
 });
 
@@ -63,7 +63,7 @@ store.on("error", function (e) {
 
 const sessionConfig = {
 	store,
-	secret: "thisshouldbeabettersecret",
+	secret: process.env.SECRET,
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
