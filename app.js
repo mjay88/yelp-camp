@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") {
 	//if we are in development, require the dotenv package, require the dotenv file
 	require("dotenv").config();
 }
+
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
@@ -23,12 +24,19 @@ const userRoutes = require("./routes/users");
 
 const app = express();
 
+// const dbUrl = process.env.DB_URL;
+const dbUrl = "mongodb://localhost:27017/yelp-camp2";
+
+const MongoStore = require("connect-mongo");
+
 //connect db
-mongoose.connect("mongodb://localhost:27017/yelp-camp2", {
+//("mongodb://localhost:27017/yelp-camp2");
+mongoose.connect(dbUrl, {
 	useNewUrlParser: true,
 	// useCreateIndex: true,//default setting in mongoose > 6
 	useUnifiedTopology: true,
 });
+
 //testing gitignore
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connections error:")); //check if there is an error
@@ -41,7 +49,20 @@ app.set("view engine", "ejs");
 //
 app.set("views", path.join(__dirname, "views")); //joins all views to the root route ('/')
 
+const store = MongoStore.create({
+	mongoUrl: dbUrl,
+	touchAfter: 24 * 60 * 60,
+	crypto: {
+		secret: "thisshouldbeabettersecret!",
+	},
+});
+
+store.on("error", function (e) {
+	console.log("Session Store Error", e);
+});
+
 const sessionConfig = {
+	store,
 	secret: "thisshouldbeabettersecret",
 	resave: false,
 	saveUninitialized: true,
